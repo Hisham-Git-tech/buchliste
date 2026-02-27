@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ _('Nicht gefunden') }}</h1>
+    <p><a href="{{ url_for('main.index') }}">{{ _('Zurück') }}</a></p>
+{% endblock %}

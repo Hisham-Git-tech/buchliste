@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for f in app/main app/cli.py app/email.py app/search.py app/tasks.py app/translate.py app/translations app/api/users.py Vagrantfile babel.cfg boot.sh Dockerfile deployment SETUP_ANLEITUNG.md)",
+      "Bash(do)",
+      "Bash(if [ -e \"/Users/hishamsinger/Microblog-main/$f\" ])",
+      "Bash(then)",
+      "Bash(echo:*)",
+      "Bash(else)",
+      "Bash(fi)",
+      "Bash(done)"
+    ]
+  }
+}

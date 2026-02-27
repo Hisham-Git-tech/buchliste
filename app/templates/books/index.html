@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set genre_labels = {
+    'fiction': 'Belletristik',
+    'non_fiction': 'Sachbuch',
+    'non-fiction': 'Sachbuch',
+    'fantasy': 'Fantasy',
+    'science_fiction': 'Science-Fiction',
+    'sci-fi': 'Science-Fiction',
+    'biography': 'Biografie',
+    'history': 'Geschichte',
+    'thriller': 'Thriller',
+    'other': 'Sonstiges'
+} %}
+{% set found_labels = {
+    'friend': 'Freund/Bekannte',
+    'social_media': 'Social Media',
+    'book_store': 'Buchhandlung',
+    'library': 'Bibliothek',
+    'online': 'Online',
+    'other': 'Sonstiges',
+    'empfehlung': 'Empfehlung',
+    'buchhandlung': 'Buchhandlung',
+    'bibliothek': 'Bibliothek',
+    'schule': 'Schule / Uni',
+    'andere': 'Sonstiges'
+} %}
+
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h2>📚 Meine Buchliste</h2>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('books.add') }}" class="btn btn-primary">+ Buch hinzufügen</a>
+    </div>
+</div>
+
+<!-- Statistiken -->
+<div class="row mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-primary">
+            <div class="card-body py-2">
+                <h3 class="text-primary mb-0">{{ stats.total }}</h3>
+                <small>Bücher total</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-success">
+            <div class="card-body py-2">
+                <h3 class="text-success mb-0">{{ stats.read }}</h3>
+                <small>Gelesen</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-warning">
+            <div class="card-body py-2">
+                <h3 class="text-warning mb-0">{{ stats.reading }}</h3>
+                <small>Lese ich gerade</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-info">
+            <div class="card-body py-2">
+                <h3 class="text-info mb-0">{{ stats.avg_rating }} ⭐</h3>
+                <small>Ø Bewertung</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter -->
+<div class="mb-3">
+    <a href="{{ url_for('books.index') }}"
+       class="btn btn-sm {{ 'btn-dark' if status_filter == 'all' else 'btn-outline-dark' }}">Alle</a>
+    <a href="{{ url_for('books.index', status='want_to_read') }}"
+       class="btn btn-sm {{ 'btn-primary' if status_filter == 'want_to_read' else 'btn-outline-primary' }}">Möchte ich lesen</a>
+    <a href="{{ url_for('books.index', status='reading') }}"
+       class="btn btn-sm {{ 'btn-warning' if status_filter == 'reading' else 'btn-outline-warning' }}">Lese ich gerade</a>
+    <a href="{{ url_for('books.index', status='read') }}"
+       class="btn btn-sm {{ 'btn-success' if status_filter == 'read' else 'btn-outline-success' }}">Gelesen</a>
+</div>
+
+<!-- Buchliste -->
+{% if books %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Titel</th>
+                <th>Autor</th>
+                <th>Genre</th>
+                <th>Status</th>
+                <th>Bewertung</th>
+                <th>Gefunden über</th>
+                <th>Notizen</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
+            <tr>
+                <td><strong>{{ book.title }}</strong></td>
+                <td>{{ book.author }}</td>
+                <td><span class="badge bg-secondary">{{ genre_labels.get(book.genre, book.genre) }}</span></td>
+                <td>
+                    {% if book.status == 'read' %}
+                        <span class="badge bg-success">Gelesen</span>
+                    {% elif book.status == 'reading' %}
+                        <span class="badge bg-warning text-dark">Lese ich</span>
+                    {% else %}
+                        <span class="badge bg-primary">Möchte lesen</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if book.rating and book.rating > 0 %}
+                        {% for i in range(book.rating) %}⭐{% endfor %}
+                    {% else %}
+                        <span class="text-muted">–</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if book.found_via %}
+                        <small class="text-muted">{{ found_labels.get(book.found_via, book.found_via) }}</small>
+                    {% else %}
+                        <span class="text-muted">–</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if book.notes %}
+                        <small class="text-muted">{{ book.notes[:50] }}{% if book.notes|length > 50 %}…{% endif %}</small>
+                    {% else %}
+                        <span class="text-muted">–</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('books.edit', id=book.id) }}" class="btn btn-sm btn-outline-primary">✏️</a>
+                    <form method="POST" action="{{ url_for('books.delete', id=book.id) }}" style="display:inline;"
+                          onsubmit="return confirm('Buch wirklich löschen?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Noch keine Bücher in deiner Liste.
+    <a href="{{ url_for('books.add') }}">Füge dein erstes Buch hinzu!</a>
+</div>
+{% endif %}
+{% endblock %}

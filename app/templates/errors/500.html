@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ _('Ein unerwarteter Fehler ist aufgetreten') }}</h1>
+    <p>{{ _('Der Administrator wurde benachrichtigt. Wir entschuldigen uns für die Unannehmlichkeiten!') }}</p>
+    <p><a href="{{ url_for('main.index') }}">{{ _('Zurück') }}</a></p>
+{% endblock %}

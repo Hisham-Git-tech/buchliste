@@ -47,6 +47,7 @@ def create_app(config_class=Config):
 
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
+    csrf.exempt(api_bp)
 
     from app.books import bp as books_bp
     app.register_blueprint(books_bp)

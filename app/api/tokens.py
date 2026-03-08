@@ -1,14 +1,42 @@
+from flask import jsonify, request
 from app import db
 from app.api import bp
-from app.api.auth import basic_auth, token_auth
+from app.models import User
+from app.api.auth import token_auth
 
 
 @bp.route('/tokens', methods=['POST'])
-@basic_auth.login_required
 def get_token():
-    token = basic_auth.current_user().get_token()
+    username = None
+    password = None
+
+    # Basic Auth lesen
+    if request.authorization:
+        username = request.authorization.username
+        password = request.authorization.password
+
+    # Optional JSON-Fallback
+    if (not username or not password) and request.is_json:
+        data = request.get_json(silent=True) or {}
+        username = data.get('username')
+        password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'missing credentials'}), 400
+
+    user = db.session.query(User).filter_by(username=username).first()
+
+    if user is None or not user.check_password(password):
+        return jsonify({'error': 'invalid credentials'}), 401
+
+    token = user.get_token()
     db.session.commit()
-    return {'token': token}
+
+    return jsonify({
+        'token': token,
+        'token_type': 'Bearer',
+        'expires_in': 3600
+    }), 200
 
 
 @bp.route('/tokens', methods=['DELETE'])
@@ -16,4 +44,4 @@ def get_token():
 def revoke_token():
     token_auth.current_user().revoke_token()
     db.session.commit()
-    return '', 204
+    return jsonify({'status': 'revoked'}), 200

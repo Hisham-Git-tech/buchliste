@@ -10,12 +10,18 @@ def get_token():
     username = None
     password = None
 
+<<<<<<< Updated upstream
     # Basic Auth lesen
+=======
+>>>>>>> Stashed changes
     if request.authorization:
         username = request.authorization.username
         password = request.authorization.password
 
+<<<<<<< Updated upstream
     # Optional JSON-Fallback
+=======
+>>>>>>> Stashed changes
     if (not username or not password) and request.is_json:
         data = request.get_json(silent=True) or {}
         username = data.get('username')

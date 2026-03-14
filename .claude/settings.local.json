@@ -8,7 +8,17 @@
       "Bash(echo:*)",
       "Bash(else)",
       "Bash(fi)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Read(//Users/hishamsinger/**)",
+      "Bash(grep -rl microblog --include=*.py --include=*.txt --include=*.cfg --include=*.md --include=*.env* --include=*.ini --include=Procfile --include=.flaskenv .)",
+      "Read(//Users/hishamsinger/Microblog-main/**)",
+      "Bash(grep -rl sqlite --include=*.py --include=*.txt --include=*.cfg --include=*.md --include=*.env* .)",
+      "Bash(grep -rl 'Buch Club' --include=*.py --include=*.html --include=*.txt .)",
+      "Read(//Users/hishamsinger/Microblog-main/=== Suche: post/message/**)",
+      "Bash(grep -rn \"class Post\\\\|class Message\\\\|class Task\\\\|class Notification\" --include=*.py .)"
     ]
   }
 }

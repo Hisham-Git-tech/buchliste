@@ -5,10 +5,8 @@ from flask_babel import _
 import sqlalchemy as sa
 from app import db
 from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm, \
-    ResetPasswordRequestForm, ResetPasswordForm
+from app.auth.forms import LoginForm, RegistrationForm
 from app.models import User
-from app.auth.email import send_password_reset_email
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -50,36 +48,3 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title=_('Registrieren'),
                            form=form)
-
-
-@bp.route('/reset_password_request', methods=['GET', 'POST'])
-def reset_password_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('books.index'))
-    form = ResetPasswordRequestForm()
-    if form.validate_on_submit():
-        user = db.session.scalar(
-            sa.select(User).where(User.email == form.email.data))
-        if user:
-            send_password_reset_email(user)
-        flash(
-            _('Bitte prüfe deine E-Mail für die Anweisungen zum Zurücksetzen des Passworts'))
-        return redirect(url_for('auth.login'))
-    return render_template('auth/reset_password_request.html',
-                           title=_('Passwort zurücksetzen'), form=form)
-
-
-@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('books.index'))
-    user = User.verify_reset_password_token(token)
-    if not user:
-        return redirect(url_for('books.index'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        user.set_password(form.password.data)
-        db.session.commit()
-        flash(_('Dein Passwort wurde zurückgesetzt.'))
-        return redirect(url_for('auth.login'))
-    return render_template('auth/reset_password.html', form=form)

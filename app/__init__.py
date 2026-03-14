@@ -1,11 +1,10 @@
 import logging
-from logging.handlers import SMTPHandler, RotatingFileHandler
+from logging.handlers import RotatingFileHandler
 import os
 from flask import Flask, request, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from flask_mail import Mail
 from flask_moment import Moment
 from flask_babel import Babel, lazy_gettext as _l
 from flask_wtf.csrf import CSRFProtect
@@ -22,7 +21,6 @@ csrf = CSRFProtect()
 login = LoginManager()
 login.login_view = 'auth.login'
 login.login_message = _l('Bitte melde dich an, um auf diese Seite zuzugreifen.')
-mail = Mail()
 moment = Moment()
 babel = Babel()
 
@@ -35,7 +33,6 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     csrf.init_app(app)
     login.init_app(app)
-    mail.init_app(app)
     moment.init_app(app)
     babel.init_app(app, locale_selector=get_locale)
 
@@ -53,21 +50,6 @@ def create_app(config_class=Config):
     app.register_blueprint(books_bp)
 
     if not app.debug and not app.testing:
-        if app.config['MAIL_SERVER']:
-            auth = None
-            if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
-                auth = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
-            secure = None
-            if app.config['MAIL_USE_TLS']:
-                secure = ()
-            mail_handler = SMTPHandler(
-                mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
-                fromaddr='no-reply@' + app.config['MAIL_SERVER'],
-                toaddrs=app.config['ADMINS'], subject='Buch Club Fehler',
-                credentials=auth, secure=secure)
-            mail_handler.setLevel(logging.ERROR)
-            app.logger.addHandler(mail_handler)
-
         if app.config['LOG_TO_STDOUT']:
             stream_handler = logging.StreamHandler()
             stream_handler.setLevel(logging.INFO)

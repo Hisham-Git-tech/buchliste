@@ -1,7 +1,0 @@
-Hallo {{ user.username }},
-
-Im Anhang findest du das Archiv deiner Beiträge, das du angefordert hast.
-
-Mit freundlichen Grüßen,
-
-Das Buch Club Team
